@@ -101,6 +101,8 @@ func TestAccessLog(t *testing.T) {
 	counter := 0
 
 	for receivedLog := range receiveLogChan {
+		t.Log(receivedLog, demoLogs[counter])
+
 		if !((receivedLog.Key == nil && demoLogs[counter].Key == nil) ||
 			*receivedLog.Key == *demoLogs[counter].Key) {
 			t.Error(fmt.Errorf("item %d key mismatch", counter))
