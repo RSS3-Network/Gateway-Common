@@ -116,7 +116,7 @@ func TestAccessLog(t *testing.T) {
 			t.Error(fmt.Errorf("item %d status mismatch", counter))
 		}
 
-		if receivedLog.Timestamp != demoLogs[counter].Timestamp {
+		if receivedLog.Timestamp.UnixNano() != demoLogs[counter].Timestamp.UnixNano() {
 			t.Error(fmt.Errorf("item %d ts mismatch", counter))
 		}
 
