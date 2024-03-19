@@ -1,0 +1,63 @@
+name: Test
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test:
+    name: Test
+    runs-on: self-hosted
+    services:
+
+      etcd:
+        image: bitnami/etcd:3.4.15
+        env:
+          ETCD_ENABLE_V2: "false"
+          ALLOW_NONE_AUTHENTICATION: "yes"
+          ETCD_ADVERTISE_CLIENT_URLS: "http://etcd:2379"
+          ETCD_LISTEN_CLIENT_URLS: "http://0.0.0.0:2379"
+        ports:
+          - "2379:2379/tcp"
+
+    steps:
+#      - name: Import Secrets
+#        uses: hashicorp/vault-action@v2.4.0
+#        with:
+#          url: ${{ secrets.VAULT_ADDR }}
+#          token: ${{ secrets.VAULT_TOKEN }}
+#          secrets: |
+#            kv/data/network/rss3-node ENDPOINT_ETHEREUM ;
+#            kv/data/network/rss3-node ENDPOINT_POLYGON ;
+#            kv/data/network/rss3-node FARCASTER_URI
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Start Redpanda container
+        run: |
+          docker run -d --name redpanda-0 \
+            --network ${{ job.container.network }} --network-alias redpanda-0 \
+            -p 9092:9092 -p 18081:18081 -p 18082:18082 -p 19092:19092 -p 19644:9644 \
+            -e GITHUB_ACTIONS=true -e CI=true \
+            docker.redpanda.com/redpandadata/redpanda:v23.2.12 \
+            redpanda start \
+              --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092 \
+              --advertise-kafka-addr internal://redpanda-0:9092,external://localhost:19092 \
+              --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:18082 \
+              --advertise-pandaproxy-addr internal://redpanda-0:8082,external://localhost:18082 \
+              --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:18081 \
+              --rpc-addr redpanda-0:33145 \
+              --advertise-rpc-addr redpanda-0:33145 \
+              --smp 1 \
+              --memory 1G \
+              --mode dev-container \
+              --default-log-level=debug
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: "1.21"
+
+      - name: Test
+        run: make test
