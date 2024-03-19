@@ -12,7 +12,7 @@ jobs:
     services:
 
       etcd:
-        image: bitnami/etcd:3.4.15
+        image: bitnami/etcd:3.5.12
         env:
           ETCD_ENABLE_V2: "false"
           ALLOW_NONE_AUTHENTICATION: "yes"
@@ -40,7 +40,7 @@ jobs:
             --network ${{ job.container.network }} --network-alias redpanda-0 \
             -p 9092:9092 -p 18081:18081 -p 18082:18082 -p 19092:19092 -p 19644:9644 \
             -e GITHUB_ACTIONS=true -e CI=true \
-            docker.redpanda.com/redpandadata/redpanda:v23.2.12 \
+            docker.redpanda.com/redpandadata/redpanda:v23.3.9 \
             redpanda start \
               --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092 \
               --advertise-kafka-addr internal://redpanda-0:9092,external://localhost:19092 \
