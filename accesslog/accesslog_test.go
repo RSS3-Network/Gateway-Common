@@ -45,7 +45,7 @@ func TestAccessLog(t *testing.T) {
 			Timestamp: time.Unix(1710849419, 0),
 		},
 		{
-			Key:       toPtr("84b01bc1-4dad-4694-99ce-514c37b88f9a"),
+			Key:       toPtr(t, "84b01bc1-4dad-4694-99ce-514c37b88f9a"),
 			Path:      "/bar",
 			Status:    http.StatusTooManyRequests,
 			Timestamp: time.Unix(1710849621, 0),
@@ -57,7 +57,7 @@ func TestAccessLog(t *testing.T) {
 			Timestamp: time.Unix(1710849652, 0),
 		},
 		{
-			Key:       toPtr("7eeb2c6d-d94f-475b-907c-50cbe01a0cb6"),
+			Key:       toPtr(t, "7eeb2c6d-d94f-475b-907c-50cbe01a0cb6"),
 			Path:      "/bar?alice=bob",
 			Status:    http.StatusTooManyRequests,
 			Timestamp: time.Unix(1710849711, 0),
@@ -134,6 +134,8 @@ func TestAccessLog(t *testing.T) {
 	t.Log("test finish")
 }
 
-func toPtr[T any](v T) *T {
+func toPtr[T any](t *testing.T, v T) *T {
+	t.Helper()
+
 	return &v
 }
