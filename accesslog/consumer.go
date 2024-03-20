@@ -73,7 +73,7 @@ func (kcs *ConsumerService) Start(process func(accessLog *Log)) error {
 				log.Fatalf(fmt.Sprint(errs))
 			}
 
-			log.Printf("A new group of access logs arrived")
+			//log.Printf("A new group of access logs arrived")
 			// We can iterate through a callback function.
 			fetches.EachPartition(func(p kgo.FetchTopicPartition) {
 				// We can even use a second callback!
