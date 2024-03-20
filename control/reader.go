@@ -4,32 +4,38 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"go.etcd.io/etcd/api/v3/v3rpc/rpctypes"
 )
 
-func (s *StateClientReader) CheckKey(ctx context.Context, key string) (*string, error) {
+func (s *StateClientReader) CheckKey(ctx context.Context, key string) (*string, *string, error) {
 	stateKey := fmt.Sprintf(TemplateValidKey, key)
 
 	stateValue, err := s.etcdClient.Get(ctx, stateKey)
 
 	if err != nil {
 		if errors.Is(err, rpctypes.ErrKeyNotFound) {
-			return nil, nil // Doesn't exist
+			return nil, nil, nil // Doesn't exist
 		}
 
 		// else
-		return nil, fmt.Errorf("etcd get %s: %w", stateKey, err)
+		return nil, nil, fmt.Errorf("etcd get %s: %w", stateKey, err)
 	}
 
 	for _, kv := range stateValue.Kvs {
 		if string(kv.Key) == stateKey {
-			value := string(kv.Value)
-			return &value, nil
+			splits := strings.SplitN(string(kv.Value), ":", 2)
+			if len(splits) < 2 {
+				return nil, nil, fmt.Errorf("invalid key info: %s", kv.Value)
+			}
+
+			// else
+			return &splits[0], &splits[1], nil // address, id
 		}
 	}
 
-	return nil, nil // No match key
+	return nil, nil, nil // No match key
 }
 
 func (s *StateClientReader) CheckAccountPaused(ctx context.Context, account string) (bool, error) {

@@ -34,6 +34,7 @@ func TestControl(t *testing.T) {
 
 	// Prepare a key
 	demoKey := "84b01bc1-4dad-4694-99ce-514c37b88f9a"
+	demoKeyID := "83298679882397449"
 	// ...and an accounts
 	demoAccount := "0xD3E8ce4841ed658Ec8dcb99B7a74beFC377253EA"
 	// ...and context
@@ -42,12 +43,13 @@ func TestControl(t *testing.T) {
 	// Test flow
 	var (
 		account *string
+		keyID   *string
 		exist   bool
 	)
 	//// State 0: nothing
-	if account, err = reader.CheckKey(ctx, demoKey); err != nil {
+	if account, keyID, err = reader.CheckKey(ctx, demoKey); err != nil {
 		t.Error(fmt.Errorf("check key: %w", err))
-	} else if account != nil {
+	} else if account != nil || keyID != nil {
 		t.Error("key should not exist")
 	}
 
@@ -58,16 +60,16 @@ func TestControl(t *testing.T) {
 	}
 
 	//// State 1: create key, no paused account
-	if err = writer.CreateKey(ctx, demoKey, demoAccount); err != nil {
+	if err = writer.CreateKey(ctx, demoAccount, demoKeyID, demoKey); err != nil {
 		t.Error(fmt.Errorf("create key: %w", err))
 	}
 
-	if account, err = reader.CheckKey(ctx, demoKey); err != nil {
+	if account, keyID, err = reader.CheckKey(ctx, demoKey); err != nil {
 		t.Error(fmt.Errorf("check key: %w", err))
-	} else if account == nil {
+	} else if account == nil || keyID == nil {
 		t.Error("key should exist")
-	} else if *account != demoAccount {
-		t.Error("wrong account")
+	} else if *account != demoAccount || *keyID != demoKeyID {
+		t.Error("wrong key info")
 	}
 
 	if exist, err = reader.CheckAccountPaused(ctx, demoAccount); err != nil {
@@ -82,12 +84,12 @@ func TestControl(t *testing.T) {
 		t.Error(fmt.Errorf("pause account: %w", err))
 	}
 
-	if account, err = reader.CheckKey(ctx, demoKey); err != nil {
+	if account, keyID, err = reader.CheckKey(ctx, demoKey); err != nil {
 		t.Error(fmt.Errorf("check key: %w", err))
-	} else if account == nil {
+	} else if account == nil || keyID == nil {
 		t.Error("key should exist")
-	} else if *account != demoAccount {
-		t.Error("wrong account")
+	} else if *account != demoAccount || *keyID != demoKeyID {
+		t.Error("wrong key info")
 	}
 
 	if exist, err = reader.CheckAccountPaused(ctx, demoAccount); err != nil {
@@ -101,9 +103,9 @@ func TestControl(t *testing.T) {
 		t.Error(fmt.Errorf("delete key: %w", err))
 	}
 
-	if account, err = reader.CheckKey(ctx, demoKey); err != nil {
+	if account, keyID, err = reader.CheckKey(ctx, demoKey); err != nil {
 		t.Error(fmt.Errorf("check key: %w", err))
-	} else if account != nil {
+	} else if account != nil || keyID != nil {
 		t.Error("key should not exist")
 	}
 
@@ -118,9 +120,9 @@ func TestControl(t *testing.T) {
 		t.Error(fmt.Errorf("resume account: %w", err))
 	}
 
-	if account, err = reader.CheckKey(ctx, demoKey); err != nil {
+	if account, keyID, err = reader.CheckKey(ctx, demoKey); err != nil {
 		t.Error(fmt.Errorf("check key: %w", err))
-	} else if account != nil {
+	} else if account != nil || keyID != nil {
 		t.Error("key should not exist")
 	}
 

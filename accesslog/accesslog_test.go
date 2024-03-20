@@ -39,25 +39,25 @@ func TestAccessLog(t *testing.T) {
 	// Prepare test case storage space
 	demoLogs := []accesslog.Log{
 		{
-			Key:       nil, // No key
+			KeyID:     nil, // No key
 			Path:      "/foo",
 			Status:    http.StatusOK,
 			Timestamp: time.Unix(1710849419, 0),
 		},
 		{
-			Key:       toPtr(t, "84b01bc1-4dad-4694-99ce-514c37b88f9a"),
+			KeyID:     toPtr(t, "651654864321234"),
 			Path:      "/bar",
 			Status:    http.StatusTooManyRequests,
 			Timestamp: time.Unix(1710849621, 0),
 		},
 		{
-			Key:       nil, // No key
+			KeyID:     nil, // No key
 			Path:      "/baz",
 			Status:    http.StatusInternalServerError,
 			Timestamp: time.Unix(1710849652, 0),
 		},
 		{
-			Key:       toPtr(t, "7eeb2c6d-d94f-475b-907c-50cbe01a0cb6"),
+			KeyID:     toPtr(t, "8645613456132156"),
 			Path:      "/bar?alice=bob",
 			Status:    http.StatusTooManyRequests,
 			Timestamp: time.Unix(1710849711, 0),
@@ -103,8 +103,8 @@ func TestAccessLog(t *testing.T) {
 	for receivedLog := range receiveLogChan {
 		t.Log(receivedLog, demoLogs[counter])
 
-		if !((receivedLog.Key == nil && demoLogs[counter].Key == nil) ||
-			*receivedLog.Key == *demoLogs[counter].Key) {
+		if !((receivedLog.KeyID == nil && demoLogs[counter].KeyID == nil) ||
+			*receivedLog.KeyID == *demoLogs[counter].KeyID) {
 			t.Error(fmt.Errorf("item %d key mismatch", counter))
 		}
 

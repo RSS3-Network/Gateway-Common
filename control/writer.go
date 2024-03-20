@@ -5,10 +5,10 @@ import (
 	"fmt"
 )
 
-func (s *StateClientWriter) CreateKey(ctx context.Context, key string, account string) error {
+func (s *StateClientWriter) CreateKey(ctx context.Context, account string, keyID string, key string) error {
 	stateKey := fmt.Sprintf(TemplateValidKey, key)
 
-	if _, err := s.etcdClient.Put(ctx, stateKey, account); err != nil {
+	if _, err := s.etcdClient.Put(ctx, stateKey, fmt.Sprintf("%s:%s", account, keyID)); err != nil {
 		return fmt.Errorf("etcd put %s: %w", stateKey, err)
 	}
 
