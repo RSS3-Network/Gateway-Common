@@ -41,12 +41,27 @@ func TestControl(t *testing.T) {
 	ctx := context.Background()
 
 	// Test flow
+
+	state0(ctx, t, reader, writer, demoKey, demoKeyID, demoAccount)
+
+	state1(ctx, t, reader, writer, demoKey, demoKeyID, demoAccount)
+
+	state2(ctx, t, reader, writer, demoKey, demoKeyID, demoAccount)
+
+	state3(ctx, t, reader, writer, demoKey, demoKeyID, demoAccount)
+
+	state4(ctx, t, reader, writer, demoKey, demoKeyID, demoAccount)
+}
+
+func state0(ctx context.Context, t *testing.T, reader *control.StateClientReader, _ *control.StateClientWriter, demoKey string, _ string, demoAccount string) {
+	//// State 0: nothing
 	var (
 		account *string
 		keyID   *string
 		exist   bool
+		err     error
 	)
-	//// State 0: nothing
+
 	if account, keyID, err = reader.CheckKey(ctx, demoKey); err != nil {
 		t.Error(fmt.Errorf("check key: %w", err))
 	} else if account != nil || keyID != nil {
@@ -58,8 +73,17 @@ func TestControl(t *testing.T) {
 	} else if exist {
 		t.Error("account should not exist")
 	}
+}
 
+func state1(ctx context.Context, t *testing.T, reader *control.StateClientReader, writer *control.StateClientWriter, demoKey string, demoKeyID string, demoAccount string) {
 	//// State 1: create key, no paused account
+	var (
+		account *string
+		keyID   *string
+		exist   bool
+		err     error
+	)
+
 	if err = writer.CreateKey(ctx, demoAccount, demoKeyID, demoKey); err != nil {
 		t.Error(fmt.Errorf("create key: %w", err))
 	}
@@ -77,8 +101,16 @@ func TestControl(t *testing.T) {
 	} else if exist {
 		t.Error("account should not exist")
 	}
+}
 
+func state2(ctx context.Context, t *testing.T, reader *control.StateClientReader, writer *control.StateClientWriter, demoKey string, demoKeyID string, demoAccount string) {
 	// State 2: create key, pause account
+	var (
+		account *string
+		keyID   *string
+		exist   bool
+		err     error
+	)
 
 	if err = writer.PauseAccount(ctx, demoAccount); err != nil {
 		t.Error(fmt.Errorf("pause account: %w", err))
@@ -97,8 +129,17 @@ func TestControl(t *testing.T) {
 	} else if !exist {
 		t.Error("account should exist")
 	}
+}
 
+func state3(ctx context.Context, t *testing.T, reader *control.StateClientReader, writer *control.StateClientWriter, demoKey string, _ string, demoAccount string) {
 	// State 3: no key, pause account
+	var (
+		account *string
+		keyID   *string
+		exist   bool
+		err     error
+	)
+
 	if err = writer.DeleteKey(ctx, demoKey); err != nil {
 		t.Error(fmt.Errorf("delete key: %w", err))
 	}
@@ -114,8 +155,17 @@ func TestControl(t *testing.T) {
 	} else if !exist {
 		t.Error("account should exist")
 	}
+}
 
+func state4(ctx context.Context, t *testing.T, reader *control.StateClientReader, writer *control.StateClientWriter, demoKey string, _ string, demoAccount string) {
 	// State 4: nothing again
+	var (
+		account *string
+		keyID   *string
+		exist   bool
+		err     error
+	)
+
 	if err = writer.ResumeAccount(ctx, demoAccount); err != nil {
 		t.Error(fmt.Errorf("resume account: %w", err))
 	}
