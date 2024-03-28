@@ -15,7 +15,7 @@ func TestControl(t *testing.T) {
 	etcdEndpoints := []string{"localhost:2379"}
 
 	// Create writer client
-	writer, err := control.NewWriter(etcdEndpoints)
+	writer, err := control.NewWriter(etcdEndpoints, nil, nil)
 
 	if err != nil {
 		t.Fatal(fmt.Errorf("create writer: %w", err))
@@ -24,7 +24,7 @@ func TestControl(t *testing.T) {
 	defer writer.Stop()
 
 	// Create reader client
-	reader, err := control.NewReader(etcdEndpoints)
+	reader, err := control.NewReader(etcdEndpoints, nil, nil)
 
 	if err != nil {
 		t.Fatal(fmt.Errorf("create reader: %w", err))

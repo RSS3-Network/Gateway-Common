@@ -53,8 +53,8 @@ type StateClientReader struct {
 	StateClientBase
 }
 
-func NewReader(endpoints []string) (*StateClientReader, error) {
-	base, err := newBase(endpoints)
+func NewReader(endpoints []string, username *string, password *string) (*StateClientReader, error) {
+	base, err := newBase(endpoints, username, password)
 	if err != nil {
 		return nil, err
 	}

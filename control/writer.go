@@ -49,8 +49,8 @@ type StateClientWriter struct {
 	StateClientBase
 }
 
-func NewWriter(endpoints []string) (*StateClientWriter, error) {
-	base, err := newBase(endpoints)
+func NewWriter(endpoints []string, username *string, password *string) (*StateClientWriter, error) {
+	base, err := newBase(endpoints, username, password)
 	if err != nil {
 		return nil, err
 	}
